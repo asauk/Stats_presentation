@@ -1,0 +1,58 @@
+---
+title: "Model Diagnositics AIC example"
+author: "Alexandra Sauk"
+date: "08/02/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load packages
+```{r}
+library(vegan)
+library(tidyverse)
+library(broom)
+```
+
+Load example datasets for Oribatid mites
+```{r}
+data(mite) #data for 35 species of Oribatid mites
+data(mite.env) #environmental variables for 70 sample sites
+data(mite.xy) #location coordinates of 70 sample sites
+
+```
+
+Join mite data for species LCIL
+
+```{r}
+LCIL.c<-mite %>% select(LCIL)
+LCIL.env<-cbind(LCIL.c, mite.env)
+
+```
+
+Make linear models for LCIL mites
+```{r}
+model1<-lm(LCIL ~., data = LCIL.env) #abundance of LCIL mites with all predictors
+model2<-lm(LCIL ~SubsDens*WatrCont, data = LCIL.env) #abundance of LCIL mites with substrate density and water content as predictors
+model3<-lm(LCIL~SubsDens*WatrCont*Substrate, data = LCIL.env) #abundance of LCIL mites with substrate density, water content, and substrate type as predictors
+model4<-lm(LCIL ~. -SubsDens, data = LCIL.env) #abundance of LCIL mites with all predictors except substrate density
+```
+
+Assessing model quality using glance() from broom package to compute the R2, adjusted R2, sigma (RSE), AIC (can also compute BIC)
+
+```{r}
+glance(model1) %>%
+  dplyr::select(adj.r.squared, sigma, AIC, p.value)
+glance(model2) %>%
+  dplyr::select(adj.r.squared, sigma, AIC, p.value)
+glance(model3) %>%
+  dplyr::select(adj.r.squared, sigma, AIC, p.value)
+glance(model4) %>%
+  dplyr::select(adj.r.squared, sigma, AIC, p.value)
+```
+
+
+
+
