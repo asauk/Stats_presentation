@@ -29,6 +29,7 @@ Join mite data for species LCIL
 ```{r}
 LCIL.c<-mite %>% select(LCIL)
 LCIL.env<-cbind(LCIL.c, mite.env)
+LCIL.env<-LCIL.env[-67,]
 
 ```
 
@@ -37,7 +38,9 @@ Make linear models for LCIL mites
 model1<-lm(LCIL ~., data = LCIL.env) #abundance of LCIL mites with all predictors
 model2<-lm(LCIL ~SubsDens*WatrCont, data = LCIL.env) #abundance of LCIL mites with substrate density and water content as predictors
 model3<-lm(LCIL~SubsDens*WatrCont*Substrate, data = LCIL.env) #abundance of LCIL mites with substrate density, water content, and substrate type as predictors
-model4<-lm(LCIL ~. -SubsDens, data = LCIL.env) #abundance of LCIL mites with all predictors except substrate density
+model4<-lm(LCIL ~SubsDens*WatrCont*Shrub, data = LCIL.env) #abundance of LCIL mites with with substrate density, water content, and shrub presence/absence as predictors
+
+
 ```
 
 Assessing model quality using glance() from broom package to compute the R2, adjusted R2, sigma (RSE), AIC (can also compute BIC)
@@ -53,6 +56,19 @@ glance(model4) %>%
   dplyr::select(adj.r.squared, sigma, AIC, p.value)
 ```
 
+```{r}
+mod1<-exp(-0.5*0)
+mod2<-exp(-0.5*15.64)
+mod3<-exp(-0.5*17.27)
+mod4<-exp(-0.5*8.44)
+summod<-sum(mod1, mod2, mod3, mod4)
+weight1<-(mod1/summod)
+weight2<-(mod2/summod)
+weight3<-(mod3/summod)
+weight4<-(mod4/summod)
 
-
-
+weight1
+weight2
+weight3
+weight4
+```

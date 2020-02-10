@@ -376,12 +376,12 @@ summary {
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## This is vegan 2.5-6</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ───────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────── tidyverse 1.3.0 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.2.1     ✓ purrr   0.3.3
 ## ✓ tibble  2.1.3     ✓ dplyr   0.8.4
 ## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
 ## ✓ readr   1.3.1     ✓ forcats 0.4.0</code></pre>
-<pre><code>## ── Conflicts ──────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(broom)</code></pre>
@@ -391,37 +391,56 @@ data(mite.env) #environmental variables for 70 sample sites
 data(mite.xy) #location coordinates of 70 sample sites</code></pre>
 <p>Join mite data for species LCIL</p>
 <pre class="r"><code>LCIL.c&lt;-mite %&gt;% select(LCIL)
-LCIL.env&lt;-cbind(LCIL.c, mite.env)</code></pre>
+LCIL.env&lt;-cbind(LCIL.c, mite.env)
+LCIL.env&lt;-LCIL.env[-67,]</code></pre>
 <p>Make linear models for LCIL mites</p>
 <pre class="r"><code>model1&lt;-lm(LCIL ~., data = LCIL.env) #abundance of LCIL mites with all predictors
 model2&lt;-lm(LCIL ~SubsDens*WatrCont, data = LCIL.env) #abundance of LCIL mites with substrate density and water content as predictors
 model3&lt;-lm(LCIL~SubsDens*WatrCont*Substrate, data = LCIL.env) #abundance of LCIL mites with substrate density, water content, and substrate type as predictors
-model4&lt;-lm(LCIL ~. -SubsDens, data = LCIL.env) #abundance of LCIL mites with all predictors except substrate density</code></pre>
+model4&lt;-lm(LCIL ~SubsDens*WatrCont*Shrub, data = LCIL.env) #abundance of LCIL mites with with substrate density, water content, and shrub presence/absence as predictors</code></pre>
 <p>Assessing model quality using glance() from broom package to compute the R2, adjusted R2, sigma (RSE), AIC (can also compute BIC)</p>
 <pre class="r"><code>glance(model1) %&gt;%
   dplyr::select(adj.r.squared, sigma, AIC, p.value)</code></pre>
 <pre><code>## # A tibble: 1 x 4
+##   adj.r.squared sigma   AIC   p.value
+##           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+## 1         0.372  24.5  650. 0.0000482</code></pre>
+<pre class="r"><code>glance(model2) %&gt;%
+  dplyr::select(adj.r.squared, sigma, AIC, p.value)</code></pre>
+<pre><code>## # A tibble: 1 x 4
 ##   adj.r.squared sigma   AIC p.value
 ##           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1         0.163  81.3  827.  0.0251</code></pre>
-<pre class="r"><code>glance(model2) %&gt;%
+## 1         0.129  28.8  666. 0.00746</code></pre>
+<pre class="r"><code>glance(model3) %&gt;%
+  dplyr::select(adj.r.squared, sigma, AIC, p.value)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   adj.r.squared sigma   AIC p.value
+##           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+## 1         0.249  26.8  667.  0.0123</code></pre>
+<pre class="r"><code>glance(model4) %&gt;%
   dplyr::select(adj.r.squared, sigma, AIC, p.value)</code></pre>
 <pre><code>## # A tibble: 1 x 4
 ##   adj.r.squared sigma   AIC  p.value
 ##           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-## 1         0.198  79.5  817. 0.000516</code></pre>
-<pre class="r"><code>glance(model3) %&gt;%
-  dplyr::select(adj.r.squared, sigma, AIC, p.value)</code></pre>
-<pre><code>## # A tibble: 1 x 4
-##   adj.r.squared sigma   AIC     p.value
-##           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;
-## 1         0.556  59.2  788. 0.000000347</code></pre>
-<pre class="r"><code>glance(model4) %&gt;%
-  dplyr::select(adj.r.squared, sigma, AIC, p.value)</code></pre>
-<pre><code>## # A tibble: 1 x 4
-##   adj.r.squared sigma   AIC p.value
-##           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1         0.172  80.9  826.  0.0169</code></pre>
+## 1         0.290  26.0  658. 0.000825</code></pre>
+<pre class="r"><code>mod1&lt;-exp(-0.5*0)
+mod2&lt;-exp(-0.5*15.64)
+mod3&lt;-exp(-0.5*17.27)
+mod4&lt;-exp(-0.5*8.44)
+summod&lt;-sum(mod1, mod2, mod3, mod4)
+weight1&lt;-(mod1/summod)
+weight2&lt;-(mod2/summod)
+weight3&lt;-(mod3/summod)
+weight4&lt;-(mod4/summod)
+
+weight1</code></pre>
+<pre><code>## [1] 0.9849519</code></pre>
+<pre class="r"><code>weight2</code></pre>
+<pre><code>## [1] 0.000395578</code></pre>
+<pre class="r"><code>weight3</code></pre>
+<pre><code>## [1] 0.0001750984</code></pre>
+<pre class="r"><code>weight4</code></pre>
+<pre><code>## [1] 0.01447746</code></pre>
 
 
 
